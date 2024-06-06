@@ -1,0 +1,9 @@
+@host=http://localhost:8088
+POST {{host}}/api/v1/login 
+Content-Type: application/json
+
+{
+  "password" : "nhutanh",
+  "email" : "example@mail.com"
+}
+###

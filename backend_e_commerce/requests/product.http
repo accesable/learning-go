@@ -1,0 +1,3 @@
+
+GET http://localhost:8088/api/v1/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkQXQiOjE3MTgyNTM2MjksInVzZXJJRCI6IjEifQ.FrUHHOUyEbalXCMwFwLXO0ENzwMh0fu0m91NGvaU24I
