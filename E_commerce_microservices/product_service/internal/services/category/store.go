@@ -26,12 +26,13 @@ func (s *Store)GetCategories(ctx context.Context) ([]types.Category,error){
   }
   var categories []types.Category
   for _, v := range db {
-    categories = append(categories, convertDBCategoryToPayloadCategory(v))
+    categories = append(categories, convertDBCategoryToPayloadCategory(&v))
   }
+  db = nil;
   return categories,nil
 }
 //  GetCategories(context context.Context) ([]Item,error)
-func convertDBCategoryToPayloadCategory(v mysqlc.Category) (types.Category){
+func convertDBCategoryToPayloadCategory(v *mysqlc.Category) (types.Category){
   return types.Category{
     ID: v.ID,
     Name: v.Name,
