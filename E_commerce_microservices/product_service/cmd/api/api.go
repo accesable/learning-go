@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+
 	"trann/ecom/product_services/internal/services/category"
 )
 
@@ -18,12 +19,13 @@ func NewAPIServer(addr string, db *sql.DB) *APIServer {
 		db:   db,
 	}
 }
+
 func (s *APIServer) Run() error {
 	router := http.NewServeMux()
 
-  categoryStore := category.NewStore(s.db)
-  categoryHandlers := category.NewHandler(categoryStore)
-  categoryHandlers.RegisterRoues(router)
+	categoryStore := category.NewStore(s.db)
+	categoryHandlers := category.NewHandler(categoryStore)
+	categoryHandlers.RegisterRoues(router)
 	server := http.Server{
 		Addr:    s.addr,
 		Handler: router,

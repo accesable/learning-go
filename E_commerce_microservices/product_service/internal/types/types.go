@@ -6,16 +6,18 @@ import (
 	"time"
 )
 
-type CategoryStore interface{
-  GetCategories(context context.Context) ([]Category,error)
+type CategoryStore interface {
+	GetCategories(ctx context.Context) ([]Category, error)
+	CreateCategory(ctx context.Context, payload *CreateCategoryPayload) (int64, error)
+	DeleteCategory(ctx context.Context, id int) error
+	GetCategoryById(ctx context.Context, id int) (Category, error)
 }
 
-
 type Category struct {
-  ID        int32 `json:"id"`
-  Name      string `json:"name"`
-  CreatedAt time.Time `json:"createdAt"`
-  UpdatedAt time.Time `json:"updatedAt"`
+	ID        int32     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Item struct {
@@ -26,4 +28,8 @@ type Item struct {
 	OriginalPrice    sql.NullFloat64
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+}
+
+type CreateCategoryPayload struct {
+	Name string `json:"name" validate:"alpha,required,min=3,max=128"`
 }
