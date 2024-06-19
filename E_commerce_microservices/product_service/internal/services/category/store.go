@@ -2,21 +2,18 @@ package category
 
 import (
 	"context"
-	"database/sql"
 
 	mysqlc "trann/ecom/product_services/internal/model"
 	"trann/ecom/product_services/internal/types"
 )
 
 type Store struct {
-	db      *sql.DB
-	queries mysqlc.Queries
+	queries *mysqlc.Queries
 }
 
-func NewStore(db *sql.DB) *Store {
+func NewStore(queries *mysqlc.Queries) *Store {
 	return &Store{
-		db:      db,
-		queries: *mysqlc.New(db),
+		queries: queries,
 	}
 }
 
@@ -71,4 +68,19 @@ func (s *Store) GetCategoryById(ctx context.Context, id int) (types.Category, er
 		return types.Category{}, err
 	}
 	return convertDBCategoryToPayloadCategory(&db), nil
+}
+
+func (s *Store) UpdateCategoryById(ctx context.Context, id int, updatedName string) (int64, error) {
+	result, err := s.queries.UpdateCategory(ctx, mysqlc.UpdateCategoryParams{
+		ID:   int32(id),
+		Name: updatedName,
+	})
+	if err != nil {
+		return 0, err
+	}
+	changedRows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return changedRows, nil
 }

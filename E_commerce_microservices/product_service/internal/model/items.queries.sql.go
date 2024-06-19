@@ -7,6 +7,7 @@ package mysqlc
 
 import (
 	"context"
+	"database/sql"
 )
 
 const listProducts = `-- name: ListProducts :many
@@ -30,6 +31,58 @@ func (q *Queries) ListProducts(ctx context.Context) ([]Item, error) {
 			&i.OriginalPrice,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProductsWithCategory = `-- name: ListProductsWithCategory :many
+SELECT 
+    i.id, 
+    i.name, 
+    i.original_price, 
+    i.short_description, 
+    c.name AS category_name
+FROM 
+    items i
+JOIN 
+    categories c 
+ON 
+    i.category_id = c.id
+`
+
+type ListProductsWithCategoryRow struct {
+	ID               int64
+	Name             string
+	OriginalPrice    sql.NullFloat64
+	ShortDescription sql.NullString
+	CategoryName     string
+}
+
+func (q *Queries) ListProductsWithCategory(ctx context.Context) ([]ListProductsWithCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, listProductsWithCategory)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListProductsWithCategoryRow
+	for rows.Next() {
+		var i ListProductsWithCategoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.OriginalPrice,
+			&i.ShortDescription,
+			&i.CategoryName,
 		); err != nil {
 			return nil, err
 		}

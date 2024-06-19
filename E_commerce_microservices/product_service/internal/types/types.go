@@ -2,7 +2,6 @@ package types
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -11,8 +10,11 @@ type CategoryStore interface {
 	CreateCategory(ctx context.Context, payload *CreateCategoryPayload) (int64, error)
 	DeleteCategory(ctx context.Context, id int) error
 	GetCategoryById(ctx context.Context, id int) (Category, error)
+	UpdateCategoryById(ctx context.Context, id int, name string) (int64, error)
 }
-
+type ItemStore interface {
+	GetItems(ctx context.Context) ([]Item, error)
+}
 type Category struct {
 	ID        int32     `json:"id"`
 	Name      string    `json:"name"`
@@ -21,15 +23,19 @@ type Category struct {
 }
 
 type Item struct {
-	ID               int64
-	Name             string
-	CategoryID       sql.NullInt32
-	ShortDescription sql.NullString
-	OriginalPrice    sql.NullFloat64
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	ID               int64     `json:"id"`
+	Name             string    `json:"name"`
+	CategoryID       int32     `json:"categoryId"`
+	ShortDescription string    `json:"shortDescription"`
+	OriginalPrice    float64   `json:"originalPrice"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
 }
 
 type CreateCategoryPayload struct {
 	Name string `json:"name" validate:"alpha,required,min=3,max=128"`
+}
+type UpdateCategoryPayload struct {
+	ID   int32  `json:"id"          validate:"required,number"`
+	Name string `json:"updatedName" validate:"required,alpha,min=3,max=128"`
 }

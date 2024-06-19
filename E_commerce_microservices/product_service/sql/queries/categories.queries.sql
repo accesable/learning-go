@@ -13,7 +13,7 @@ WHERE name = ?;
 UPDATE categories
 SET name = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?;
--- name: DeleteCategory :execresult
+-- name: DeleteCategory :exec
 DELETE FROM categories
 WHERE id = ?;
 -- name: ListCategories :many
