@@ -13,4 +13,14 @@ JOIN
     categories c 
 ON 
     i.category_id = c.id;
-
+-- name: InsertProduct :execresult
+INSERT INTO items (
+  name,original_price,short_description,category_id
+) VALUES ( ?,?,?,? );
+-- name: DeleteProduct :execresult
+DELETE FROM items
+  WHERE id = ?;
+-- name: UpdateProduct :execresult
+UPDATE items
+  SET name = ? , original_price = ? , short_description = ? , updated_at = CURRENT_TIMESTAMP
+  WHERE condition;

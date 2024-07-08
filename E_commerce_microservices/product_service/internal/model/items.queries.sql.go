@@ -10,6 +10,37 @@ import (
 	"database/sql"
 )
 
+const deleteProduct = `-- name: DeleteProduct :execresult
+DELETE FROM items
+  WHERE id = ?
+`
+
+func (q *Queries) DeleteProduct(ctx context.Context, id int64) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteProduct, id)
+}
+
+const insertProduct = `-- name: InsertProduct :execresult
+INSERT INTO items (
+  name,original_price,short_description,category_id
+) VALUES ( ?,?,?,? )
+`
+
+type InsertProductParams struct {
+	Name             string
+	OriginalPrice    sql.NullFloat64
+	ShortDescription sql.NullString
+	CategoryID       sql.NullInt32
+}
+
+func (q *Queries) InsertProduct(ctx context.Context, arg InsertProductParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, insertProduct,
+		arg.Name,
+		arg.OriginalPrice,
+		arg.ShortDescription,
+		arg.CategoryID,
+	)
+}
+
 const listProducts = `-- name: ListProducts :many
 SELECT id, name, category_id, short_description, original_price, created_at, updated_at FROM items
 `
@@ -95,4 +126,20 @@ func (q *Queries) ListProductsWithCategory(ctx context.Context) ([]ListProductsW
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProduct = `-- name: UpdateProduct :execresult
+UPDATE items
+  SET name = ? , original_price = ? , short_description = ? , updated_at = CURRENT_TIMESTAMP
+  WHERE condition
+`
+
+type UpdateProductParams struct {
+	Name             string
+	OriginalPrice    sql.NullFloat64
+	ShortDescription sql.NullString
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateProduct, arg.Name, arg.OriginalPrice, arg.ShortDescription)
 }

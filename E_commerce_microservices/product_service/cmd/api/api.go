@@ -26,13 +26,15 @@ func (s *APIServer) Run() error {
 	router := http.NewServeMux()
 	queriesInstance := mysqlc.New(s.db)
 	// Category handlers
+	log.Println("Injected Queries to Category repository")
 	categoryStore := category.NewStore(queriesInstance)
 	categoryHandlers := category.NewHandler(categoryStore)
 	categoryHandlers.RegisterRoues(router)
 
 	// Items handlers
+	log.Println("Injected Queries to Items repository")
 	itemStore := items.NewStore(queriesInstance)
-	itemHandlers := items.NewHandler(itemStore)
+	itemHandlers := items.NewHandler(itemStore, categoryStore)
 	itemHandlers.RegisterRoutes(router)
 	server := http.Server{
 		Addr:    s.addr,
