@@ -19,13 +19,10 @@ type ItemStore interface {
 	DeleteItem(ctx context.Context, id int64) (int64, error)
 }
 type CreateItemPayload struct {
-	// ID               int64     `json:"id"`
 	Name             string  `json:"name"             validate:"required,min=3,max=128"`
 	CategoryID       int32   `json:"categoryId"       validate:"required,number"`
 	ShortDescription string  `json:"shortDescription"`
 	OriginalPrice    float64 `json:"originalPrice"    validate:"required,number"`
-	// CreatedAt        time.Time `json:"createdAt"`
-	// UpdatedAt        time.Time `json:"updatedAt"`
 }
 type Category struct {
 	ID        int32     `json:"id"`
