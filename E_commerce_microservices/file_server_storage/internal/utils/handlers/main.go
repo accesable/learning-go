@@ -5,11 +5,18 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"trann/ecom/file_server_storage/internal/utils"
 )
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the multipart form in the request, setting a max memory limit
 	r.ParseMultipartForm(10 << 20) // 10 MB limit
+
+	// get dir name
+	dirName := r.PathValue("dirName")
+	id := r.PathValue("id")
+	// fileName := r.URL.Query().Get("fileName")
 
 	// Retrieve the file from the form data
 	file, handler, err := r.FormFile("file")
@@ -25,8 +32,10 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("File Size: %+v\n", handler.Size)
 	fmt.Printf("MIME Header: %+v\n", handler.Header)
 
+	// ext := filepath.Ext(handler.Filename)
 	// Create a new file in the local filesystem
-	dst, err := os.Create("./uploads/uploaded_" + handler.Filename)
+	// dst, err := os.Create("./uploads/uploaded_" + handler.Filename)
+	dst, err := os.Create(fmt.Sprintf("./uploads/%s/%s/%s", dirName, id, handler.Filename))
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		http.Error(w, "Error creating file", http.StatusInternalServerError)
@@ -43,5 +52,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Inform the client that the file has been uploaded successfully
-	fmt.Fprintf(w, "File uploaded successfully: %s", handler.Filename)
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"msg":  fmt.Sprintf("image uploaded at path /%s/%s", dirName, handler.Filename),
+		"path": fmt.Sprintf("/%s/%s/%s", dirName, id, handler.Filename),
+	})
 }

@@ -21,7 +21,11 @@ func NewFileServer(addr string, uploadDir string) *FileServer {
 
 func (s *FileServer) Run() error {
 	router := http.NewServeMux()
-	router.HandleFunc("POST /upload", handlers.UploadHandler)
+	router.HandleFunc("POST /upload/{dirName}/{id}", handlers.UploadHandler)
+
+	fs := http.FileServer(http.Dir("uploads"))
+
+	router.Handle("/", fs)
 	srv := http.Server{
 		Addr:    s.addr,
 		Handler: router,
