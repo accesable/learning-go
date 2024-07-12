@@ -24,3 +24,13 @@ DELETE FROM items
 UPDATE items
   SET name = ? , original_price = ? , short_description = ? , updated_at = CURRENT_TIMESTAMP
   WHERE condition;
+
+-- name: PartialUpdateItem :execresult
+UPDATE items
+SET
+    name = COALESCE(?, name),
+    category_id = COALESCE(?, category_id),
+    short_description = COALESCE(?, short_description),
+    original_price = COALESCE(?, original_price),
+    updated_at = CURRENT_TIMESTAMP 
+WHERE id = ?

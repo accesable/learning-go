@@ -18,10 +18,17 @@ type Category struct {
 
 type Item struct {
 	ID               int64
-	Name             string
+	Name             sql.NullString
 	CategoryID       sql.NullInt32
 	ShortDescription sql.NullString
 	OriginalPrice    sql.NullFloat64
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+}
+
+type ItemImage struct {
+	ID          int64
+	DisplayName sql.NullString
+	ImageUrl    string
+	ItemID      int64
 }

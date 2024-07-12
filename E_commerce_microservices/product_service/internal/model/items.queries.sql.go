@@ -26,7 +26,7 @@ INSERT INTO items (
 `
 
 type InsertProductParams struct {
-	Name             string
+	Name             sql.NullString
 	OriginalPrice    sql.NullFloat64
 	ShortDescription sql.NullString
 	CategoryID       sql.NullInt32
@@ -93,7 +93,7 @@ ON
 
 type ListProductsWithCategoryRow struct {
 	ID               int64
-	Name             string
+	Name             sql.NullString
 	OriginalPrice    sql.NullFloat64
 	ShortDescription sql.NullString
 	CategoryName     string
@@ -128,6 +128,35 @@ func (q *Queries) ListProductsWithCategory(ctx context.Context) ([]ListProductsW
 	return items, nil
 }
 
+const partialUpdateItem = `-- name: PartialUpdateItem :execresult
+UPDATE items
+SET
+    name = COALESCE(?, name),
+    category_id = COALESCE(?, category_id),
+    short_description = COALESCE(?, short_description),
+    original_price = COALESCE(?, original_price),
+    updated_at = CURRENT_TIMESTAMP 
+WHERE id = ?
+`
+
+type PartialUpdateItemParams struct {
+	Name             sql.NullString
+	CategoryID       sql.NullInt32
+	ShortDescription sql.NullString
+	OriginalPrice    sql.NullFloat64
+	ID               int64
+}
+
+func (q *Queries) PartialUpdateItem(ctx context.Context, arg PartialUpdateItemParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, partialUpdateItem,
+		arg.Name,
+		arg.CategoryID,
+		arg.ShortDescription,
+		arg.OriginalPrice,
+		arg.ID,
+	)
+}
+
 const updateProduct = `-- name: UpdateProduct :execresult
 UPDATE items
   SET name = ? , original_price = ? , short_description = ? , updated_at = CURRENT_TIMESTAMP
@@ -135,7 +164,7 @@ UPDATE items
 `
 
 type UpdateProductParams struct {
-	Name             string
+	Name             sql.NullString
 	OriginalPrice    sql.NullFloat64
 	ShortDescription sql.NullString
 }

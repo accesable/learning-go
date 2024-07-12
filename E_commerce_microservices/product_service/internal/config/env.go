@@ -18,6 +18,7 @@ type Config struct {
 	DBName                 string
 	JWTSecret              string
 	JWTExpirationInSeconds int64
+	FILE_SERVER_CONFIG     string
 }
 
 var Envs = initConfig()
@@ -38,6 +39,7 @@ func initConfig() Config {
 		DBName:                 getEnv("DB_NAME", "ecom"),
 		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
+		FILE_SERVER_CONFIG:     getEnv("FILE_SERVER_HOST", "http://localhost:8089"),
 	}
 }
 
@@ -73,6 +75,7 @@ func getEnv(key, fallback string) string {
 	}
 	return fallback
 }
+
 func getEnvAsInt(key string, fallback int64) int64 {
 	if value, ok := os.LookupEnv(key); ok {
 		i, err := strconv.ParseInt(value, 10, 64)

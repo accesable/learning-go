@@ -13,16 +13,25 @@ type CategoryStore interface {
 	UpdateCategoryById(ctx context.Context, id int, name string) (int64, error)
 }
 type ItemStore interface {
-	GetItems(ctx context.Context) ([]Item, error)
+	GetItems(ctx context.Context, opts ...GetItemsOption) ([]Item, error)
 	CreateItem(ctx context.Context, payload *CreateItemPayload) (int64, error)
-	// DeleteItem(ctx context.Context, id int) error
 	DeleteItem(ctx context.Context, id int64) (int64, error)
+	GetItemImagesById(ctx context.Context, id int) ([]ItemImage, error)
+	UploadImageToItemId(ctx context.Context, itemImage ItemImage) (int64, error)
+	UpdateItemById(ctx context.Context, id int, updatePayload PartialUpdateItem) (int64, error)
 }
 type CreateItemPayload struct {
 	Name             string  `json:"name"             validate:"required,min=3,max=128"`
 	CategoryID       int32   `json:"categoryId"       validate:"required,number"`
 	ShortDescription string  `json:"shortDescription"`
 	OriginalPrice    float64 `json:"originalPrice"    validate:"required,number"`
+}
+type PartialUpdateItem struct {
+	Name             *string   `json:"name,omitempty"`
+	CategoryID       *int      `json:"categoryId,omitempty"`
+	ShortDescription *string   `json:"shortDescription,omitempty"`
+	OriginalPrice    *float64  `json:"originalPrice,omitempty"`
+	UpdatedAt        time.Time `json:"updatedAt"`
 }
 type Category struct {
 	ID        int32     `json:"id"`
@@ -32,13 +41,15 @@ type Category struct {
 }
 
 type Item struct {
-	ID               int64     `json:"id"`
-	Name             string    `json:"name"`
-	CategoryID       int32     `json:"categoryId"`
-	ShortDescription string    `json:"shortDescription"`
-	OriginalPrice    float64   `json:"originalPrice"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	ID               int64       `json:"id"`
+	Name             string      `json:"name"`
+	CategoryID       int32       `json:"categoryId"`
+	CategoryName     string      `json:"categoryName,omitempty"`
+	ShortDescription string      `json:"shortDescription"`
+	OriginalPrice    float64     `json:"originalPrice"`
+	ImgURLs          []ItemImage `json:"imgUrls,omitempty"`
+	CreatedAt        time.Time   `json:"createdAt"`
+	UpdatedAt        time.Time   `json:"updatedAt"`
 }
 
 type CreateCategoryPayload struct {
@@ -47,4 +58,10 @@ type CreateCategoryPayload struct {
 type UpdateCategoryPayload struct {
 	ID   int32  `json:"id"          validate:"required,number"`
 	Name string `json:"updatedName" validate:"required,alpha,min=3,max=128"`
+}
+type ItemImage struct {
+	ID          int64  `json:"id"`
+	DisplayName string `json:"displayName"`
+	ImageUrl    string `json:"imageUrl"`
+	ItemID      int64  `json:"itemId"`
 }

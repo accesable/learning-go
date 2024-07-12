@@ -1,6 +1,6 @@
 CREATE TABLE items (
   id bigint auto_increment primary key,
-  name varchar(128) not null ,
+  name varchar(128),
   category_id int ,
   short_description varchar(255),
   original_price float,
