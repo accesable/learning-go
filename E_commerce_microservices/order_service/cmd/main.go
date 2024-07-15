@@ -29,7 +29,7 @@ func init() {
 }
 
 func main() {
-	srv := api.NewAPIServer(":8087", nil)
+	srv := api.NewAPIServer(":8087", db)
 	if err := srv.Run(); err != nil {
 		log.Fatal("Unable to Start up Server")
 	}
