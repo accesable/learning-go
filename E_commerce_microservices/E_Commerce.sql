@@ -66,14 +66,14 @@ CREATE TABLE `options` (
 );
 
 -- Create options_products table
-CREATE TABLE `options_products` (
+CREATE TABLE `options_items` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `price_modifier_value` float,
-  `product_id` int NOT NULL,
+  `item_id` int NOT NULL,
   `option_id` int NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `last_updated_at` datetime(6) NOT NULL,
-  FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  FOREIGN KEY (`item_id`) REFERENCES `items` (`id`),
   FOREIGN KEY (`option_id`) REFERENCES `options` (`id`)
 );
 
@@ -81,9 +81,9 @@ CREATE TABLE `options_products` (
 CREATE TABLE `selected_options_details` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `detail_id` int NOT NULL,
-  `option_product_id` int NOT NULL,
+  `option_item_id` int NOT NULL,
   FOREIGN KEY (`detail_id`) REFERENCES `order_details` (`id`),
-  FOREIGN KEY (`option_product_id`) REFERENCES `options_products` (`id`)
+  FOREIGN KEY (`option_item_id`) REFERENCES `options_items` (`id`)
 );
 
 -- Adding indexes for performance optimization

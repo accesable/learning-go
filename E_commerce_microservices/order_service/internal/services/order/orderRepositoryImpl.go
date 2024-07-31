@@ -57,13 +57,33 @@ func (s *Store) CreateOrderDetailsToOrder(
 	orderDetails []*models.OrderDetail,
 ) error {
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, detail := range orderDetails {
-			detail.OrderID = int64(orderId)
-			if err := tx.Create(&detail).Error; err != nil {
-				return err
-			}
+		var existingDetails []models.OrderDetail
+		if err := tx.Where("order_id = ?", orderId).Find(&existingDetails).Error; err != nil {
+			return err
 		}
 
+		// Create a map to track existing order details by ItemID
+		existingDetailsMap := make(map[int64]*models.OrderDetail)
+		for i := range existingDetails {
+			detail := &existingDetails[i]
+			existingDetailsMap[detail.ItemID] = detail
+		}
+
+		for _, detail := range orderDetails {
+			if existingDetail, exists := existingDetailsMap[detail.ItemID]; exists {
+				// If the detail already exists, increment the quantity
+				existingDetail.Quantity += detail.Quantity
+				if err := tx.Save(existingDetail).Error; err != nil {
+					return err
+				}
+			} else {
+				// If the detail does not exist, create a new one
+				detail.OrderID = int64(orderId)
+				if err := tx.Create(detail).Error; err != nil {
+					return err
+				}
+			}
+		}
 		return nil
 	})
 }
