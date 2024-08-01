@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"log"
 	"os"
 	"time"
 
@@ -14,7 +13,8 @@ import (
 )
 
 type UserService struct {
-	Repo repositories.UserRepository
+	Repo     repositories.UserRepository
+	RoleRepo repositories.RoleRepository
 }
 
 func (s *UserService) Signup(username, email, password string) (*models.User, error) {
@@ -56,12 +56,20 @@ func (s *UserService) GenerateJWT(user *models.User) (string, error) {
 	if jwtSecret == "" {
 		return "", errors.New("JWT secret is not set")
 	}
+	var roleStrs []string
+	userRoles, err := s.RoleRepo.GetUserRoles(user.ID)
+	if err != nil {
+		return "", err
+	}
+	for _, v := range userRoles {
+		roleStrs = append(roleStrs, v.RoleName)
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":       user.ID,
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Hour * 72).Unix(),
+		"roles":    roleStrs,
 	})
-	log.Printf("jwt %v", jwtSecret)
 	tokenString, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", err

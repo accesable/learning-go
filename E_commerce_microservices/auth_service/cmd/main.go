@@ -27,7 +27,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Role{})
 }
 
 func main() {

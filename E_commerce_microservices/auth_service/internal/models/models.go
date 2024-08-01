@@ -11,4 +11,15 @@ type User struct {
 	LastName     string `gorm:"size:100"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	Roles        []Role `gorm:"many2many:user_roles"`
+}
+
+type Role struct {
+	ID       uint   `gorm:"primaryKey;autoIncrement"`
+	RoleName string `gorm:"unique;not null"`
+}
+
+type UserRole struct {
+	UserID uint
+	RoleID uint
 }
